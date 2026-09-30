@@ -1,0 +1,18 @@
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+from scalar_fastapi import add_scalar_reference
+
+from .api import router
+from .database.session import create_db_tables
+
+
+@asynccontextmanager
+async def lifespan_handler(app: FastAPI):
+    await create_db_tables()
+    yield
+
+app = FastAPI(lifespan=lifespan_handler)
+app.include_router(router=router)
+
+add_scalar_reference(app)
